@@ -54,14 +54,14 @@ func (c CurrencyCode) IsValid() bool {
 	if len(code) != 3 {
 		return false
 	}
-	
+
 	// Check if all characters are uppercase letters
 	for _, char := range code {
 		if char < 'A' || char > 'Z' {
 			return false
 		}
 	}
-	
+
 	return true
 }
 
