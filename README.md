@@ -95,8 +95,9 @@ go run cmd/server/main.go
 ## Development Status
 
 - [x] Initial project setup
-- [ ] Domain entities and validation
-- [ ] Database layer implementation
+- [x] Domain entities and validation
+- [x] Database layer implementation
+- [ ] Use Cases
 - [ ] REST API endpoints
 - [ ] Treasury API integration
 - [ ] Currency conversion logic
