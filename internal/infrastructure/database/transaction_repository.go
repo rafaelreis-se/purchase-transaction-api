@@ -68,6 +68,37 @@ func (r *sqliteTransactionRepository) GetAll() ([]entities.Transaction, error) {
 	return transactions, nil
 }
 
+// GetAllPaginated retrieves transactions with pagination support
+func (r *sqliteTransactionRepository) GetAllPaginated(page, size int) ([]entities.Transaction, int64, error) {
+	var transactions []entities.Transaction
+	var total int64
+
+	// Validate pagination parameters
+	if page < 1 {
+		page = 1
+	}
+	if size < 1 || size > 100 {
+		size = 20 // Default size
+	}
+
+	// Calculate offset
+	offset := (page - 1) * size
+
+	// Get total count
+	result := r.db.Model(&entities.Transaction{}).Count(&total)
+	if result.Error != nil {
+		return nil, 0, result.Error
+	}
+
+	// Get paginated transactions ordered by created_at DESC (most recent first)
+	result = r.db.Order("created_at DESC").Limit(size).Offset(offset).Find(&transactions)
+	if result.Error != nil {
+		return nil, 0, result.Error
+	}
+
+	return transactions, total, nil
+}
+
 // Update modifies an existing transaction in the database
 func (r *sqliteTransactionRepository) Update(transaction *entities.Transaction) error {
 	if transaction == nil {

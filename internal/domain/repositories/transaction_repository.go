@@ -20,6 +20,10 @@ type TransactionRepository interface {
 	// Returns empty slice if no transactions exist
 	GetAll() ([]entities.Transaction, error)
 
+	// GetAllPaginated retrieves transactions with pagination support
+	// Returns transactions for the specified page, total count, and error if operation fails
+	GetAllPaginated(page, size int) ([]entities.Transaction, int64, error)
+
 	// Update modifies an existing transaction in the database
 	// Returns error if transaction doesn't exist or operation fails
 	Update(transaction *entities.Transaction) error
