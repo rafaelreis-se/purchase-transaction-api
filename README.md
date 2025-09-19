@@ -1,115 +1,137 @@
 # Purchase Transaction API
 
-A Go application for managing purchase transactions with multi-currency conversion support using Treasury exchange rates.
+A REST API application that stores purchase transactions in USD and converts them to other currencies using US Treasury exchange rates.
 
-## Project Overview
+## What it does
 
-This application was built to meet the following requirements:
+- **Store purchase transactions** with description, date, and USD amount
+- **Convert transactions** to foreign currencies (EUR, BRL, CAD, JPY, etc.)
+- **Uses official exchange rates** from US Treasury API
+- **Validates all data** according to business rules
+- **Provides REST endpoints** for integration
 
-- Store purchase transactions with validation
-- Convert transactions to different currencies using Treasury Reporting Rates of Exchange API
-- Provide RESTful API endpoints for transaction management
+Built to demonstrate clean architecture, testing practices, and production-ready deployment.
 
-## Technology Stack
+## Prerequisites
 
-After analyzing the project requirements, I chose the following packages:
+### Option 1: Local Development
 
-### HTTP Framework
+- **Go 1.25+** - [Install Go](https://golang.org/doc/install)
+- **Make** - Usually pre-installed on Linux/Mac
+- **Git** - For cloning the repository
 
-```bash
-go get github.com/gin-gonic/gin
-```
+### Option 2: Docker Only
 
-**Justification**: Gin is the most popular HTTP framework in Go, offering excellent performance, middleware support, and clean routing. Perfect for building production-ready REST APIs.
+- **Docker** - [Install Docker](https://docs.docker.com/get-docker/)
+- **No Go/Make needed** - Everything runs in container
 
-### Database & ORM
+## Quick Start
 
-```bash
-go get gorm.io/gorm
-go get gorm.io/driver/sqlite
-```
-
-**Justification**:
-
-- **GORM**: Industry standard ORM for Go, provides type-safe database operations and migration support
-- **SQLite**: Meets the requirement of "fully functional without installing separate databases", while being production-ready and ACID compliant
-
-### Testing
+### Local Development
 
 ```bash
-go get github.com/stretchr/testify
-```
-
-**Justification**: De facto standard for testing in Go. Provides assertions, test suites, and mocking capabilities essential for the required "functional automated testing for Production applications".
-
-### Validation
-
-```bash
-go get github.com/go-playground/validator/v10
-```
-
-**Justification**: Robust validation library that integrates seamlessly with struct tags. Essential for validating transaction fields (description length, positive amounts, date formats).
-
-### Configuration Management
-
-```bash
-go get github.com/spf13/viper
-```
-
-**Justification**: Popular configuration management library supporting multiple formats (JSON, YAML, ENV). Enables flexible configuration for different environments.
-
-### UUID Generation
-
-```bash
-go get github.com/google/uuid
-```
-
-**Justification**: Google's UUID implementation provides cryptographically secure unique identifiers for transaction records, meeting the "unique identifier" requirement.
-
-## 🏗 Architecture
-
-This project follows Clean Architecture principles with clear separation of concerns:
-
-```
-├── cmd/server/          # Application entry point
-├── internal/domain/     # Business logic and entities
-├── internal/application/# Use cases and handlers
-├── internal/infrastructure/ # Database, HTTP, external APIs
-└── tests/              # Comprehensive test suite
-```
-
-## Getting Started
-
-```bash
-# Clone the repository
 git clone https://github.com/rafaelreis-se/purchase-transaction-api.git
 cd purchase-transaction-api
 
-# Install dependencies
-go mod tidy
+# Setup environment
+cp .env.example .env
 
-# Run the application
-go run cmd/server/main.go
+# Install dependencies and run
+make run
+
+# Test the API
+make test
+make api-test
 ```
 
-## Development Status
-
-- [x] Initial project setup
-- [x] Domain entities and validation
-- [x] Database layer implementation
-- [ ] Use Cases
-- [ ] REST API endpoints
-- [ ] Treasury API integration
-- [ ] Currency conversion logic
-- [ ] Comprehensive test suite
-- [ ] Documentation and examples
-
-## Running Tests
+### Docker (No Go Required)
 
 ```bash
-# Run all tests
-go test ./...
+git clone https://github.com/rafaelreis-se/purchase-transaction-api.git
+cd purchase-transaction-api
 
-# Run tests with coverage
-go test -cover ./...
+# Setup environment
+cp .env.example .env
+
+# Build and run in Docker
+make docker
 ```
+
+make docker
+
+````
+
+**API ready at:** `http://localhost:8080`
+
+## Available Commands
+
+```bash
+make help      # Show all available commands
+make run       # Run application locally
+make test      # Run all tests (236 tests)
+make api-test  # Test complete API workflow
+make docker    # Build and run in Docker
+make health    # Check application status
+````
+
+## API Endpoints
+
+### Store Transaction
+
+```http
+POST /api/v1/transactions
+Content-Type: application/json
+
+{
+  "description": "Coffee purchase",
+  "date": "2024-01-15T10:30:00Z",
+  "amount": 25.50
+}
+```
+
+### Convert Currency
+
+```http
+POST /api/v1/transactions/{id}/convert
+Content-Type: application/json
+
+{
+  "target_currency": "EUR"
+}
+```
+
+### Get Transaction
+
+```http
+GET /api/v1/transactions/{id}
+GET /api/v1/transactions
+```
+
+## Supported Currencies
+
+**Available:** EUR, BRL, CAD, JPY, CNY, AUD  
+**Source:** US Treasury Reporting Rates API  
+**Rule:** Uses exchange rate ≤ purchase date within 6 months
+
+## Testing
+
+**Import API Collection:** [`docs/insomnia-collection.json`](docs/insomnia-collection.json)
+
+- Complete test scenarios included
+- Error cases covered
+- Ready to import into Insomnia
+
+## Validation Rules
+
+- **Description:** ≤ 50 characters
+- **Date:** Valid ISO format
+- **Amount:** Positive USD, rounded to cents
+- **Currency conversion:** Must have rate within 6 months
+
+## Architecture
+
+- **Framework:** Gin + GORM
+- **Database:** SQLite (embedded)
+- **External API:** US Treasury exchange rates
+- **Logging:** Structured JSON logging
+- **Container:** Multi-stage Docker build (43MB)

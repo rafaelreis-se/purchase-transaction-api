@@ -53,7 +53,7 @@ func (h *TransactionHandler) CreateTransaction(c *gin.Context) {
 		contextLogger.LogError(err, "Invalid request format in CreateTransaction")
 		c.JSON(http.StatusBadRequest, gin.H{
 			"error":   "Invalid request format",
-			"details": err.Error(),
+			"details": formatValidationError(err),
 		})
 		return
 	}
@@ -68,8 +68,11 @@ func (h *TransactionHandler) CreateTransaction(c *gin.Context) {
 	if err != nil {
 		// Check error type for appropriate status code
 		statusCode := http.StatusInternalServerError
+		errorMessage := err.Error()
+
 		if isValidationError(err) {
 			statusCode = http.StatusBadRequest
+			errorMessage = formatValidationError(err)
 		}
 
 		contextLogger.LogError(err, "Failed to create transaction",
@@ -79,7 +82,7 @@ func (h *TransactionHandler) CreateTransaction(c *gin.Context) {
 
 		c.JSON(statusCode, gin.H{
 			"error":   "Failed to create transaction",
-			"details": err.Error(),
+			"details": errorMessage,
 		})
 		return
 	}
@@ -275,4 +278,37 @@ func isExchangeRateNotFoundError(err error) bool {
 
 func contains(s, substr string) bool {
 	return strings.Contains(s, substr)
+}
+
+// formatValidationError converts technical validation errors to user-friendly messages
+func formatValidationError(err error) string {
+	errMsg := err.Error()
+
+	// Handle specific validation errors with user-friendly messages
+	if strings.Contains(errMsg, "Description") && strings.Contains(errMsg, "max") {
+		return "Description must not exceed 50 characters"
+	}
+	if strings.Contains(errMsg, "Amount") && strings.Contains(errMsg, "min") {
+		return "Amount must be greater than 0"
+	}
+	if strings.Contains(errMsg, "Date") && strings.Contains(errMsg, "datetime") {
+		return "Date must be in valid ISO 8601 format (e.g., 2024-01-15T10:30:00Z)"
+	}
+	if strings.Contains(errMsg, "Description") && strings.Contains(errMsg, "required") {
+		return "Description is required"
+	}
+	if strings.Contains(errMsg, "Amount") && strings.Contains(errMsg, "required") {
+		return "Amount is required"
+	}
+	if strings.Contains(errMsg, "Date") && strings.Contains(errMsg, "required") {
+		return "Date is required"
+	}
+
+	// For other validation errors, return a generic message
+	if strings.Contains(errMsg, "validation failed") {
+		return "Request validation failed. Please check your input data."
+	}
+
+	// Fallback to original error for non-validation errors
+	return errMsg
 }

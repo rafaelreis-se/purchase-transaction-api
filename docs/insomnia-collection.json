@@ -1,0 +1,470 @@
+{
+  "_type": "export",
+  "__export_format": 4,
+  "__export_date": "2025-09-19T00:00:00.000Z",
+  "__export_source": "insomnia.desktop.app:v2023.5.8",
+  "resources": [
+    {
+      "_id": "req_0",
+      "parentId": "fld_health",
+      "modified": 1695081600000,
+      "created": 1695081600000,
+      "url": "{{ _.base_url }}/health",
+      "name": "Health Check",
+      "description": "Check if the API is running",
+      "method": "GET",
+      "body": {},
+      "parameters": [],
+      "headers": [],
+      "authentication": {},
+      "metaSortKey": -1695081600000,
+      "isPrivate": false,
+      "_type": "request"
+    },
+    {
+      "_id": "req_1",
+      "parentId": "fld_transactions",
+      "modified": 1695081600000,
+      "created": 1695081600000,
+      "url": "{{ _.base_url }}/api/v1/transactions",
+      "name": "Create Transaction - Coffee",
+      "description": "Create a new transaction for coffee purchase",
+      "method": "POST",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"description\": \"Coffee at Starbucks\",\n  \"date\": \"2024-01-15T10:30:00Z\",\n  \"amount\": 25.50\n}"
+      },
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "authentication": {},
+      "metaSortKey": -1695081600000,
+      "isPrivate": false,
+      "_type": "request"
+    },
+    {
+      "_id": "req_2",
+      "parentId": "fld_transactions",
+      "modified": 1695081600000,
+      "created": 1695081600000,
+      "url": "{{ _.base_url }}/api/v1/transactions",
+      "name": "Create Transaction - Book",
+      "description": "Create a new transaction for book purchase",
+      "method": "POST",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"description\": \"Technical book - Clean Architecture\",\n  \"date\": \"2024-01-16T14:20:00Z\",\n  \"amount\": 89.99\n}"
+      },
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "authentication": {},
+      "metaSortKey": -1695081599000,
+      "isPrivate": false,
+      "_type": "request"
+    },
+    {
+      "_id": "req_3",
+      "parentId": "fld_transactions",
+      "modified": 1695081600000,
+      "created": 1695081600000,
+      "url": "{{ _.base_url }}/api/v1/transactions",
+      "name": "Create Transaction - Dinner",
+      "description": "Create a new transaction for dinner",
+      "method": "POST",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"description\": \"Dinner at Italian Restaurant\",\n  \"date\": \"2024-01-17T19:45:00Z\",\n  \"amount\": 156.75\n}"
+      },
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "authentication": {},
+      "metaSortKey": -1695081598000,
+      "isPrivate": false,
+      "_type": "request"
+    },
+    {
+      "_id": "req_4",
+      "parentId": "fld_transactions",
+      "modified": 1695081600000,
+      "created": 1695081600000,
+      "url": "{{ _.base_url }}/api/v1/transactions",
+      "name": "List All Transactions",
+      "description": "Get all transactions",
+      "method": "GET",
+      "body": {},
+      "parameters": [],
+      "headers": [],
+      "authentication": {},
+      "metaSortKey": -1695081597000,
+      "isPrivate": false,
+      "_type": "request"
+    },
+    {
+      "_id": "req_5",
+      "parentId": "fld_transactions",
+      "modified": 1695081600000,
+      "created": 1695081600000,
+      "url": "{{ _.base_url }}/api/v1/transactions/{{ _.transaction_id }}",
+      "name": "Get Transaction by ID",
+      "description": "Get a specific transaction by ID",
+      "method": "GET",
+      "body": {},
+      "parameters": [],
+      "headers": [],
+      "authentication": {},
+      "metaSortKey": -1695081596000,
+      "isPrivate": false,
+      "_type": "request"
+    },
+    {
+      "_id": "req_6",
+      "parentId": "fld_conversions",
+      "modified": 1695081600000,
+      "created": 1695081600000,
+      "url": "{{ _.base_url }}/api/v1/transactions/{{ _.transaction_id }}/convert",
+      "name": "Convert to EUR",
+      "description": "Convert transaction to Euro",
+      "method": "POST",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"target_currency\": \"EUR\"\n}"
+      },
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "authentication": {},
+      "metaSortKey": -1695081595000,
+      "isPrivate": false,
+      "_type": "request"
+    },
+    {
+      "_id": "req_7",
+      "parentId": "fld_conversions",
+      "modified": 1695081600000,
+      "created": 1695081600000,
+      "url": "{{ _.base_url }}/api/v1/transactions/{{ _.transaction_id }}/convert",
+      "name": "Convert to BRL",
+      "description": "Convert transaction to Brazilian Real",
+      "method": "POST",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"target_currency\": \"BRL\"\n}"
+      },
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "authentication": {},
+      "metaSortKey": -1695081594000,
+      "isPrivate": false,
+      "_type": "request"
+    },
+    {
+      "_id": "req_8",
+      "parentId": "fld_conversions",
+      "modified": 1695081600000,
+      "created": 1695081600000,
+      "url": "{{ _.base_url }}/api/v1/transactions/{{ _.transaction_id }}/convert",
+      "name": "Convert to CAD",
+      "description": "Convert transaction to Canadian Dollar",
+      "method": "POST",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"target_currency\": \"CAD\"\n}"
+      },
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "authentication": {},
+      "metaSortKey": -1695081593000,
+      "isPrivate": false,
+      "_type": "request"
+    },
+    {
+      "_id": "req_9",
+      "parentId": "fld_conversions",
+      "modified": 1695081600000,
+      "created": 1695081600000,
+      "url": "{{ _.base_url }}/api/v1/transactions/{{ _.transaction_id }}/convert",
+      "name": "Convert to GBP",
+      "description": "Convert transaction to British Pound",
+      "method": "POST",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"target_currency\": \"GBP\"\n}"
+      },
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "authentication": {},
+      "metaSortKey": -1695081592000,
+      "isPrivate": false,
+      "_type": "request"
+    },
+    {
+      "_id": "req_10",
+      "parentId": "fld_conversions",
+      "modified": 1695081600000,
+      "created": 1695081600000,
+      "url": "{{ _.base_url }}/api/v1/transactions/{{ _.transaction_id }}/convert",
+      "name": "Convert to JPY",
+      "description": "Convert transaction to Japanese Yen",
+      "method": "POST",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"target_currency\": \"JPY\"\n}"
+      },
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "authentication": {},
+      "metaSortKey": -1695081591000,
+      "isPrivate": false,
+      "_type": "request"
+    },
+    {
+      "_id": "req_11",
+      "parentId": "fld_errors",
+      "modified": 1695081600000,
+      "created": 1695081600000,
+      "url": "{{ _.base_url }}/api/v1/transactions",
+      "name": "Error - Invalid Date",
+      "description": "Test error handling for invalid date",
+      "method": "POST",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"description\": \"Invalid date transaction\",\n  \"date\": \"invalid-date\",\n  \"amount\": 100.00\n}"
+      },
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "authentication": {},
+      "metaSortKey": -1695081590000,
+      "isPrivate": false,
+      "_type": "request"
+    },
+    {
+      "_id": "req_12",
+      "parentId": "fld_errors",
+      "modified": 1695081600000,
+      "created": 1695081600000,
+      "url": "{{ _.base_url }}/api/v1/transactions",
+      "name": "Error - Negative Amount",
+      "description": "Test error handling for negative amount",
+      "method": "POST",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"description\": \"Negative amount test\",\n  \"date\": \"2024-01-15T10:30:00Z\",\n  \"amount\": -50.00\n}"
+      },
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "authentication": {},
+      "metaSortKey": -1695081589000,
+      "isPrivate": false,
+      "_type": "request"
+    },
+    {
+      "_id": "req_12b",
+      "parentId": "fld_errors",
+      "modified": 1695081600000,
+      "created": 1695081600000,
+      "url": "{{ _.base_url }}/api/v1/transactions",
+      "name": "Error - Description Too Long",
+      "description": "Test error handling for description > 50 characters",
+      "method": "POST",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"description\": \"This is a very long description that exceeds the fifty character limit for transaction descriptions\",\n  \"date\": \"2024-01-15T10:30:00Z\",\n  \"amount\": 100.00\n}"
+      },
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "authentication": {},
+      "metaSortKey": -1695081588500,
+      "isPrivate": false,
+      "_type": "request"
+    },
+    {
+      "_id": "req_13",
+      "parentId": "fld_errors",
+      "modified": 1695081600000,
+      "created": 1695081600000,
+      "url": "{{ _.base_url }}/api/v1/transactions/00000000-0000-0000-0000-000000000000",
+      "name": "Error - Transaction Not Found",
+      "description": "Test error handling for non-existent transaction",
+      "method": "GET",
+      "body": {},
+      "parameters": [],
+      "headers": [],
+      "authentication": {},
+      "metaSortKey": -1695081588000,
+      "isPrivate": false,
+      "_type": "request"
+    },
+    {
+      "_id": "req_14",
+      "parentId": "fld_errors",
+      "modified": 1695081600000,
+      "created": 1695081600000,
+      "url": "{{ _.base_url }}/api/v1/transactions/{{ _.transaction_id }}/convert",
+      "name": "Error - Invalid Currency",
+      "description": "Test error handling for invalid currency",
+      "method": "POST",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"target_currency\": \"INVALID\"\n}"
+      },
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "authentication": {},
+      "metaSortKey": -1695081587000,
+      "isPrivate": false,
+      "_type": "request"
+    },
+    {
+      "_id": "fld_health",
+      "parentId": "wrk_main",
+      "modified": 1695081600000,
+      "created": 1695081600000,
+      "name": "🏥 Health Check",
+      "description": "",
+      "environment": {},
+      "environmentPropertyOrder": null,
+      "metaSortKey": -1695081600000,
+      "_type": "request_group"
+    },
+    {
+      "_id": "fld_transactions",
+      "parentId": "wrk_main",
+      "modified": 1695081600000,
+      "created": 1695081600000,
+      "name": "💰 Transactions",
+      "description": "",
+      "environment": {},
+      "environmentPropertyOrder": null,
+      "metaSortKey": -1695081599000,
+      "_type": "request_group"
+    },
+    {
+      "_id": "fld_conversions",
+      "parentId": "wrk_main",
+      "modified": 1695081600000,
+      "created": 1695081600000,
+      "name": "💱 Currency Conversions",
+      "description": "",
+      "environment": {},
+      "environmentPropertyOrder": null,
+      "metaSortKey": -1695081598000,
+      "_type": "request_group"
+    },
+    {
+      "_id": "fld_errors",
+      "parentId": "wrk_main",
+      "modified": 1695081600000,
+      "created": 1695081600000,
+      "name": "🧪 Error Test Cases",
+      "description": "",
+      "environment": {},
+      "environmentPropertyOrder": null,
+      "metaSortKey": -1695081597000,
+      "_type": "request_group"
+    },
+    {
+      "_id": "env_base",
+      "parentId": "wrk_main",
+      "modified": 1695081600000,
+      "created": 1695081600000,
+      "name": "Base Environment",
+      "data": {
+        "base_url": "http://localhost:8080",
+        "transaction_id": ""
+      },
+      "dataPropertyOrder": {
+        "&": ["base_url", "transaction_id"]
+      },
+      "color": null,
+      "isPrivate": false,
+      "metaSortKey": 1695081600000,
+      "_type": "environment"
+    },
+    {
+      "_id": "jar_cookies",
+      "parentId": "wrk_main",
+      "modified": 1695081600000,
+      "created": 1695081600000,
+      "name": "Default Jar",
+      "cookies": [],
+      "_type": "cookie_jar"
+    },
+    {
+      "_id": "spc_main",
+      "parentId": "wrk_main",
+      "modified": 1695081600000,
+      "created": 1695081600000,
+      "fileName": "Purchase Transaction API",
+      "contents": "",
+      "contentType": "yaml",
+      "_type": "api_spec"
+    },
+    {
+      "_id": "wrk_main",
+      "parentId": null,
+      "modified": 1695081600000,
+      "created": 1695081600000,
+      "name": "Purchase Transaction API",
+      "description": "Complete API collection for testing the Purchase Transaction API with currency conversions using Treasury API",
+      "_type": "workspace"
+    }
+  ]
+}
