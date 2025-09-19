@@ -50,8 +50,12 @@ make api-test
 git clone https://github.com/rafaelreis-se/purchase-transaction-api.git
 cd purchase-transaction-api
 
-# Setup environment
+# Setup environment for Docker
 cp .env.example .env
+
+# IMPORTANT: Edit .env and change DB_PATH for Docker
+# Change: DB_PATH=transactions.db
+# To:     DB_PATH=/app/data/transactions.db
 
 # Build and run with Docker commands
 docker build -t purchase-transaction-api:latest .
@@ -61,6 +65,7 @@ docker run --rm -p 8080:8080 --env-file .env purchase-transaction-api:latest
 ### Or with Make (if available)
 
 ```bash
+# Still need to edit .env for Docker first
 make docker
 ```
 
@@ -78,6 +83,24 @@ make run       # Run application locally
 make test      # Run all tests (236 tests)
 make api-test  # Test complete API workflow
 make docker    # Build and run in Docker
+make health    # Check application health (Linux/Mac)
+make health-windows  # Check application health (Windows)
+```
+
+## Testing the API
+
+### Linux/Mac:
+```bash
+curl http://localhost:8080/health
+```
+
+### Windows PowerShell:
+```powershell
+Invoke-RestMethod -Uri http://localhost:8080/health
+```
+
+### Any Browser:
+Open: `http://localhost:8080/health`
 make health    # Check application status
 ````
 
@@ -134,6 +157,25 @@ GET /api/v1/transactions
 - **Date:** Valid ISO format
 - **Amount:** Positive USD, rounded to cents
 - **Currency conversion:** Must have rate within 6 months
+
+## Troubleshooting
+
+### Docker: "no such file or directory" database error
+**Problem:** SQLite cannot create database file in Docker container.
+**Solution:** Edit `.env` file and change:
+```bash
+# From:
+DB_PATH=transactions.db
+
+# To:
+DB_PATH=/app/data/transactions.db
+```
+
+### Windows: curl command not found
+**Solution:** Use PowerShell instead:
+```powershell
+Invoke-RestMethod -Uri http://localhost:8080/health
+```
 
 ## Architecture
 
