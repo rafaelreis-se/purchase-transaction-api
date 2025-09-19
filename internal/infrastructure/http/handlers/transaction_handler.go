@@ -10,6 +10,7 @@ import (
 	"github.com/rafaelreis-se/purchase-transaction-api/internal/application/dto"
 	"github.com/rafaelreis-se/purchase-transaction-api/internal/application/usecases"
 	"github.com/rafaelreis-se/purchase-transaction-api/internal/domain/entities"
+	"github.com/rafaelreis-se/purchase-transaction-api/internal/pkg/logger"
 )
 
 // TransactionHandler handles HTTP requests for transaction operations
@@ -37,16 +38,30 @@ func NewTransactionHandler(
 
 // CreateTransaction handles POST /transactions
 func (h *TransactionHandler) CreateTransaction(c *gin.Context) {
+	// Get logger from context (set by middleware)
+	log, exists := c.Get("logger")
+	if !exists {
+		// Fallback if logger not in context
+		log = &logger.Logger{}
+	}
+	contextLogger := log.(*logger.Logger)
+
 	var request dto.CreateTransactionRequest
 
 	// Bind JSON request to DTO
 	if err := c.ShouldBindJSON(&request); err != nil {
+		contextLogger.LogError(err, "Invalid request format in CreateTransaction")
 		c.JSON(http.StatusBadRequest, gin.H{
 			"error":   "Invalid request format",
 			"details": err.Error(),
 		})
 		return
 	}
+
+	contextLogger.Info("Creating new transaction",
+		"description", request.Description,
+		"amount", request.Amount,
+	)
 
 	// Execute use case
 	response, err := h.createTransactionUseCase.Execute(&request)
@@ -57,12 +72,22 @@ func (h *TransactionHandler) CreateTransaction(c *gin.Context) {
 			statusCode = http.StatusBadRequest
 		}
 
+		contextLogger.LogError(err, "Failed to create transaction",
+			"status_code", statusCode,
+			"request", request,
+		)
+
 		c.JSON(statusCode, gin.H{
 			"error":   "Failed to create transaction",
 			"details": err.Error(),
 		})
 		return
 	}
+
+	contextLogger.LogOperation("create_transaction", response.ID.String(), true,
+		"amount", response.Amount,
+		"description", response.Description,
+	)
 
 	// Return successful response
 	c.JSON(http.StatusCreated, response)
@@ -146,10 +171,20 @@ func (h *TransactionHandler) ListTransactions(c *gin.Context) {
 
 // ConvertTransaction handles POST /transactions/:id/convert
 func (h *TransactionHandler) ConvertTransaction(c *gin.Context) {
+	// Get logger from context
+	log, exists := c.Get("logger")
+	if !exists {
+		log = &logger.Logger{}
+	}
+	contextLogger := log.(*logger.Logger)
+
 	// Parse UUID from path parameter
 	idParam := c.Param("id")
 	transactionID, err := uuid.Parse(idParam)
 	if err != nil {
+		contextLogger.LogError(err, "Invalid transaction ID format in ConvertTransaction",
+			"transaction_id_param", idParam,
+		)
 		c.JSON(http.StatusBadRequest, gin.H{
 			"error":   "Invalid transaction ID format",
 			"details": "Transaction ID must be a valid UUID",
@@ -163,12 +198,20 @@ func (h *TransactionHandler) ConvertTransaction(c *gin.Context) {
 	}
 
 	if err := c.ShouldBindJSON(&requestBody); err != nil {
+		contextLogger.LogError(err, "Invalid request format in ConvertTransaction",
+			"transaction_id", transactionID.String(),
+		)
 		c.JSON(http.StatusBadRequest, gin.H{
 			"error":   "Invalid request format",
 			"details": err.Error(),
 		})
 		return
 	}
+
+	contextLogger.Info("Converting transaction currency",
+		"transaction_id", transactionID.String(),
+		"target_currency", requestBody.TargetCurrency,
+	)
 
 	// Create use case request
 	request := &dto.ConvertTransactionRequest{
@@ -189,12 +232,25 @@ func (h *TransactionHandler) ConvertTransaction(c *gin.Context) {
 			statusCode = http.StatusUnprocessableEntity
 		}
 
+		contextLogger.LogError(err, "Failed to convert transaction",
+			"transaction_id", transactionID.String(),
+			"target_currency", requestBody.TargetCurrency,
+			"status_code", statusCode,
+		)
+
 		c.JSON(statusCode, gin.H{
 			"error":   "Failed to convert transaction",
 			"details": err.Error(),
 		})
 		return
 	}
+
+	contextLogger.LogOperation("convert_transaction", transactionID.String(), true,
+		"target_currency", requestBody.TargetCurrency,
+		"original_amount", response.Transaction.Amount,
+		"converted_amount", response.ConvertedAmount,
+		"exchange_rate", response.ExchangeRate,
+	)
 
 	// Return successful response
 	c.JSON(http.StatusOK, response)
@@ -219,8 +275,4 @@ func isExchangeRateNotFoundError(err error) bool {
 
 func contains(s, substr string) bool {
 	return strings.Contains(s, substr)
-}
-
-func indexOf(s, substr string) int {
-	return strings.Index(s, substr)
 }

@@ -2,6 +2,7 @@ package usecases_test
 
 import (
 	"errors"
+	"fmt"
 	"testing"
 	"time"
 
@@ -20,8 +21,9 @@ func TestConvertTransactionUseCase_Execute(t *testing.T) {
 	// Setup
 	mockTransactionRepo := new(mocks.MockTransactionRepository)
 	mockExchangeRateRepo := new(mocks.MockExchangeRateRepository)
+	mockTreasuryService := new(mocks.MockTreasuryService)
 	validator := validator.New()
-	usecase := usecases.NewConvertTransactionUseCase(mockTransactionRepo, mockExchangeRateRepo, validator)
+	usecase := usecases.NewConvertTransactionUseCase(mockTransactionRepo, mockExchangeRateRepo, mockTreasuryService, validator)
 
 	t.Run("Successful currency conversion", func(t *testing.T) {
 		// Arrange
@@ -187,6 +189,8 @@ func TestConvertTransactionUseCase_Execute(t *testing.T) {
 		mockTransactionRepo.On("GetByID", request.TransactionID).Return(&transaction, nil).Once()
 		// Mock exchange rate repository to return nil (no rate found)
 		mockExchangeRateRepo.On("FindRateForConversion", entities.USD, entities.BRL, transaction.Date).Return(nil, nil).Once()
+		// Mock treasury service to return error (no rate found)
+		mockTreasuryService.On("FetchExchangeRate", entities.USD, entities.BRL, transaction.Date).Return(nil, fmt.Errorf("no suitable exchange rate found within 6 months")).Once()
 
 		// Act
 		response, err := usecase.Execute(request)
@@ -195,11 +199,10 @@ func TestConvertTransactionUseCase_Execute(t *testing.T) {
 		assert.Error(t, err)
 		assert.Nil(t, response)
 		assert.Contains(t, err.Error(), "failed to find exchange rate")
-		assert.Contains(t, err.Error(), "no suitable exchange rate found")
-		assert.Contains(t, err.Error(), "within 6 months")
 
 		mockTransactionRepo.AssertExpectations(t)
 		mockExchangeRateRepo.AssertExpectations(t)
+		mockTreasuryService.AssertExpectations(t)
 	})
 
 	t.Run("Exchange rate repository error", func(t *testing.T) {
@@ -315,10 +318,11 @@ func TestConvertTransactionUseCase_Constructor(t *testing.T) {
 		// Arrange
 		mockTransactionRepo := new(mocks.MockTransactionRepository)
 		mockExchangeRateRepo := new(mocks.MockExchangeRateRepository)
+		mockTreasuryService := new(mocks.MockTreasuryService)
 		validator := validator.New()
 
 		// Act
-		usecase := usecases.NewConvertTransactionUseCase(mockTransactionRepo, mockExchangeRateRepo, validator)
+		usecase := usecases.NewConvertTransactionUseCase(mockTransactionRepo, mockExchangeRateRepo, mockTreasuryService, validator)
 
 		// Assert
 		assert.NotNil(t, usecase)

@@ -2,6 +2,7 @@ package middleware
 
 import (
 	"fmt"
+	"log/slog"
 	"time"
 
 	"github.com/gin-contrib/cors"
@@ -48,9 +49,14 @@ func ErrorHandler() gin.HandlerFunc {
 			// Get the last error
 			err := c.Errors.Last()
 
-			// Log the error (in production, use proper logging)
+			// Log the error using structured logging
 			requestID, _ := c.Get("request_id")
-			gin.DefaultWriter.Write([]byte("Error [" + requestID.(string) + "]: " + err.Error() + "\n"))
+			slog.Error("Request error",
+				"request_id", requestID,
+				"error", err.Error(),
+				"path", c.Request.URL.Path,
+				"method", c.Request.Method,
+			)
 
 			// Return error response if not already sent
 			if !c.Writer.Written() {

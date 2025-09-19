@@ -3,10 +3,10 @@ package database
 import (
 	"fmt"
 
+	"github.com/rafaelreis-se/purchase-transaction-api/internal/domain/entities"
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
-	"github.com/rafaelreis-se/purchase-transaction-api/internal/domain/entities"
 )
 
 // SQLiteDB wraps GORM database connection

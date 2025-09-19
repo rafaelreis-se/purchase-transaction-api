@@ -6,6 +6,7 @@ type Config struct {
 	Server   ServerConfig
 	Database DatabaseConfig
 	Treasury TreasuryConfig
+	Logger   LoggerConfig
 }
 
 type ServerConfig struct {
@@ -21,6 +22,11 @@ type TreasuryConfig struct {
 	TimeoutSeconds int
 }
 
+type LoggerConfig struct {
+	Level  string
+	Format string
+}
+
 // LoadConfig loads configuration with default values
 func LoadConfig() *Config {
 	return &Config{
@@ -31,8 +37,12 @@ func LoadConfig() *Config {
 			Path: getEnv("DB_PATH", "transactions.db"),
 		},
 		Treasury: TreasuryConfig{
-			BaseURL:        getEnv("TREASURY_BASE_URL", "https://api.fiscaldata.treasury.gov/services/api/v1/accounting/od/rates_of_exchange"),
+			BaseURL:        getEnv("TREASURY_BASE_URL", "https://api.fiscaldata.treasury.gov/services/api/fiscal_service/v1/accounting/od/rates_of_exchange"),
 			TimeoutSeconds: getEnvInt("TREASURY_TIMEOUT_SECONDS", 30),
+		},
+		Logger: LoggerConfig{
+			Level:  getEnv("LOG_LEVEL", "INFO"),
+			Format: getEnv("LOG_FORMAT", "json"), // json for production, text for development
 		},
 	}
 }

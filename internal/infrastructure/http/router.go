@@ -4,29 +4,46 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/rafaelreis-se/purchase-transaction-api/internal/infrastructure/http/handlers"
 	"github.com/rafaelreis-se/purchase-transaction-api/internal/infrastructure/http/middleware"
+	"github.com/rafaelreis-se/purchase-transaction-api/internal/pkg/logger"
 )
 
 // Router sets up the HTTP routes for the application
 type Router struct {
 	transactionHandler *handlers.TransactionHandler
+	logger             *logger.Logger
 }
 
 // NewRouter creates a new Router with the provided handlers
-func NewRouter(transactionHandler *handlers.TransactionHandler) *Router {
+func NewRouter(transactionHandler *handlers.TransactionHandler, log *logger.Logger) *Router {
 	return &Router{
 		transactionHandler: transactionHandler,
+		logger:             log,
 	}
 }
 
 // SetupRoutes configures all the routes for the application
 func (r *Router) SetupRoutes() *gin.Engine {
-	// Create Gin router with default middleware (Logger and Recovery)
-	router := gin.Default()
+	// Create Gin router without default logger (we'll use our structured logger)
+	router := gin.New()
 
-	// Add custom middleware
+	// Add recovery middleware
+	router.Use(gin.Recovery())
+
+	// Add custom middleware with structured logging
+	router.Use(middleware.RequestIDMiddleware(r.logger))
+	router.Use(middleware.LoggingMiddleware(r.logger))
+	router.Use(middleware.ErrorLoggingMiddleware(r.logger))
 	router.Use(middleware.CORS())
-	router.Use(middleware.RequestID())
 	router.Use(middleware.ErrorHandler())
+
+	// Health check endpoint for Docker
+	router.GET("/health", func(c *gin.Context) {
+		c.JSON(200, gin.H{
+			"status":    "healthy",
+			"service":   "purchase-transaction-api",
+			"timestamp": gin.H{"unix": gin.H{}},
+		})
+	})
 
 	// API v1 routes
 	v1 := router.Group("/api/v1")
@@ -47,14 +64,6 @@ func (r *Router) SetupRoutes() *gin.Engine {
 			transactions.POST("/:id/convert", r.transactionHandler.ConvertTransaction)
 		}
 	}
-
-	// Health check endpoint
-	router.GET("/health", func(c *gin.Context) {
-		c.JSON(200, gin.H{
-			"status":  "healthy",
-			"service": "purchase-transaction-api",
-		})
-	})
 
 	// API documentation endpoint
 	router.GET("/", func(c *gin.Context) {

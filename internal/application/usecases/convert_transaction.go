@@ -2,6 +2,7 @@ package usecases
 
 import (
 	"fmt"
+	"log/slog"
 	"time"
 
 	"github.com/go-playground/validator/v10"
@@ -9,12 +10,14 @@ import (
 	"github.com/rafaelreis-se/purchase-transaction-api/internal/application/dto"
 	"github.com/rafaelreis-se/purchase-transaction-api/internal/domain/entities"
 	"github.com/rafaelreis-se/purchase-transaction-api/internal/domain/repositories"
+	"github.com/rafaelreis-se/purchase-transaction-api/internal/domain/services"
 )
 
 // ConvertTransactionUseCase handles the business logic for currency conversion of transactions
 type ConvertTransactionUseCase struct {
 	transactionRepo  repositories.TransactionRepository
 	exchangeRateRepo repositories.ExchangeRateRepository
+	treasuryService  services.TreasuryService
 	validator        *validator.Validate
 }
 
@@ -22,11 +25,13 @@ type ConvertTransactionUseCase struct {
 func NewConvertTransactionUseCase(
 	transactionRepo repositories.TransactionRepository,
 	exchangeRateRepo repositories.ExchangeRateRepository,
+	treasuryService services.TreasuryService,
 	validator *validator.Validate,
 ) *ConvertTransactionUseCase {
 	return &ConvertTransactionUseCase{
 		transactionRepo:  transactionRepo,
 		exchangeRateRepo: exchangeRateRepo,
+		treasuryService:  treasuryService,
 		validator:        validator,
 	}
 }
@@ -95,7 +100,7 @@ func (uc *ConvertTransactionUseCase) getTransaction(transactionID uuid.UUID) (*e
 }
 
 // validateConversionRules validates business rules for currency conversion
-func (uc *ConvertTransactionUseCase) validateConversionRules(_ *entities.Transaction, targetCurrency entities.CurrencyCode) error {
+func (uc *ConvertTransactionUseCase) validateConversionRules(transaction *entities.Transaction, targetCurrency entities.CurrencyCode) error {
 	// Validate target currency
 	if !targetCurrency.IsValid() {
 		return fmt.Errorf("invalid target currency: %s", targetCurrency)
@@ -106,23 +111,44 @@ func (uc *ConvertTransactionUseCase) validateConversionRules(_ *entities.Transac
 		return fmt.Errorf("cannot convert USD transaction to USD")
 	}
 
+	// Additional business rules can be added here
+	// For example: check if transaction is not too old, business hours, etc.
+
 	return nil
 }
 
 // findExchangeRate finds a suitable exchange rate implementing the 6-month rule
+// First tries local repository, then falls back to Treasury API
 func (uc *ConvertTransactionUseCase) findExchangeRate(targetCurrency entities.CurrencyCode, transactionDate time.Time) (*entities.ExchangeRate, error) {
-	// Find exchange rate from USD to target currency within 6 months of transaction date
+	// 1. First, try to find exchange rate in local repository
 	exchangeRate, err := uc.exchangeRateRepo.FindRateForConversion(entities.USD, targetCurrency, transactionDate)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("error searching local exchange rates: %w", err)
 	}
 
-	if exchangeRate == nil {
-		return nil, fmt.Errorf("no suitable exchange rate found for %s within 6 months of transaction date %s",
-			targetCurrency, transactionDate.Format("2006-01-02"))
+	// 2. If found in local repository, return it
+	if exchangeRate != nil {
+		return exchangeRate, nil
 	}
 
-	return exchangeRate, nil
+	// 3. If not found locally, fetch from Treasury API
+	treasuryRate, err := uc.treasuryService.FetchExchangeRate(entities.USD, targetCurrency, transactionDate)
+	if err != nil {
+		return nil, fmt.Errorf("failed to fetch exchange rate from Treasury API: %w", err)
+	}
+
+	// 4. Save the fetched rate to local repository for future use (caching)
+	if err := uc.exchangeRateRepo.Save(treasuryRate); err != nil {
+		// Log error but don't fail the conversion - we still have the rate
+		slog.Warn("Failed to cache exchange rate from Treasury API",
+			"error", err.Error(),
+			"from_currency", string(entities.USD),
+			"to_currency", string(targetCurrency),
+			"rate", treasuryRate.Rate,
+		)
+	}
+
+	return treasuryRate, nil
 }
 
 // createConvertedTransaction creates a ConvertedTransaction entity with validation

@@ -37,3 +37,7 @@ go.work.sum
 # Database files
 *.db
 
+# Build artifacts
+bin/
+/server
+*.binary
