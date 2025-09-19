@@ -23,7 +23,7 @@ Built to demonstrate clean architecture, testing practices, and production-ready
 ### Option 2: Docker Only
 
 - **Docker** - [Install Docker](https://docs.docker.com/get-docker/)
-- **No Go/Make needed** - Everything runs in container
+- **No Go/Make/Git needed** - Everything runs in container
 
 ## Quick Start
 
@@ -44,16 +44,24 @@ make test
 make api-test
 ```
 
-### Docker (No Go Required)
+### Docker Only (Zero Dependencies)
 
 ```bash
-git clone https://github.com/rafaelreis-se/purchase-transaction-api.git
-cd purchase-transaction-api
+# Download and extract
+curl -L https://github.com/rafaelreis-se/purchase-transaction-api/archive/main.zip -o api.zip
+unzip api.zip && cd purchase-transaction-api-main
 
 # Setup environment
 cp .env.example .env
 
-# Build and run in Docker
+# Build and run with pure Docker commands
+docker build -t purchase-transaction-api:latest .
+docker run --rm -p 8080:8080 --env-file .env purchase-transaction-api:latest
+```
+
+### Or with Make (if available)
+
+```bash
 make docker
 ```
 
