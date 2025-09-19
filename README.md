@@ -47,14 +47,13 @@ make api-test
 ### Docker Only (Zero Dependencies)
 
 ```bash
-# Download and extract
-curl -L https://github.com/rafaelreis-se/purchase-transaction-api/archive/main.zip -o api.zip
-unzip api.zip && cd purchase-transaction-api-main
+git clone https://github.com/rafaelreis-se/purchase-transaction-api.git
+cd purchase-transaction-api
 
 # Setup environment
 cp .env.example .env
 
-# Build and run with pure Docker commands
+# Build and run with Docker commands
 docker build -t purchase-transaction-api:latest .
 docker run --rm -p 8080:8080 --env-file .env purchase-transaction-api:latest
 ```

@@ -47,9 +47,9 @@ docker-dev: docker-build ## Run application in Docker with local .env
 	@echo "Running in Docker with local dev config..."
 	docker run --rm -p 8080:8080 --env-file .env purchase-transaction-api:latest
 
-docker: docker-build ## Build and run in Docker with production config
-	@echo "Running in Docker with production config..."
-	docker run --rm -p 8080:8080 --env-file .env.production purchase-transaction-api:latest
+docker: docker-build ## Build and run in Docker with dev config
+	@echo "🚀 Running in Docker with dev config..."
+	docker run --rm -p 8080:8080 --env-file .env purchase-transaction-api:latest
 
 # === API Testing ===
 health: ## Check application health
